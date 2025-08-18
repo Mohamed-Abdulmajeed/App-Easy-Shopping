@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home User</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link href="bootstrap-5.2.3-dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="bg-secondary">
+
+    <!--!_______ Navbar___________ -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top m-0">
+        <div class="container m-0">
+            <!-- Name & logo -->
+            <a class="navbar-brand fw-bold" href="#">
+                <img src="images/icon.png" alt="Cart Icon" width="40px">
+                Eazy Shop
+            </a>
+            <!-- btn toggler -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNav">
+                <!-- drop-down item -->
+                <ul class="navbar-nav me-3">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            Categories
+                        </a>
+                        <ul class="dropdown-menu" id="dropdown-item-categories"></ul>
+                    </li>
+                </ul>
+                <!-- form search -->
+                <form class="d-flex flex-grow-1 me-2" role="search">
+                    <input id="input-search" class="form-control me-1" type="search" placeholder="Search products..."
+                        aria-label="Search" />
+                    <button id="btn-search" class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+                <!-- buttons to swap between tabs  -->
+                <!--each btn call fun  showTab to go to tab-->
+                <div class="d-flex">
+                    <button class="btn btn-outline-primary btn-sm me-2" onclick="showTab('items')">
+                        <i class="fa-solid fa-box"></i> Items
+                    </button>
+                    <button class="btn btn-outline-primary btn-sm me-2" onclick="showTab('orders')">
+                        <i class="fa-solid fa-list"></i> Orders
+                    </button>
+                    <!-- btn to show card in model and on click add event to call fun ( refreshCurd )-->
+                    <button id="btncart" type="button" class="btn btn-outline-info position-relative"
+                        data-bs-toggle="modal" data-bs-target="#cartModal">
+                        <i class="bi bi-cart3 fs-4"></i>Cart
+                        <!-- this value update when add cart -->
+                        <span id="NoCart"
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            0
+                        </span>
+                    </button>
+                    <button class="btn btn-outline-danger ms-3" onclick="window.location.href = 'index.html'">
+                        <i class="fa fa-sign-out "></i>Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!--! _____Page budy _________-->
+    <div class="container mt-5 pt-5">
+
+        <!-- ! Products Tap -->
+        <div id="tab-items" class="tab-pane active">
+
+            <div class="container">
+                <div class="row">
+                    <!-- Main Section -->
+                    <section class="col-md-12">
+                        <div class="row g-3" id="items-in-body">
+                            <!-- !fill cards here when run function (getProducts,filterProducts,filterbySearchProducts) -->
+
+                        </div>
+                    </section>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- !__________tab-orders_____________________ -->
+        <div id="tab-orders" class="tab-pane d-none">
+
+            <div class="container my-5">
+                <h2 class="mb-4">My Orders</h2>
+
+                <div class="list-group" id="all-orders">
+                    <!--! Order Item Fill when run fun getOrders-->
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!-- !-///////////////////////////////////////// -->
+    <!-- !_______________ Models______________ -->
+    <!--! Bootstrap Modal to show model alert -->
+    <div class="modal fade" id="customAlert" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-center">
+                <div class="modal-body">
+                    <p id="customAlertMessage" class="mb-3"></p>
+                    <button type="button" class="btn btn-primary px-4" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!--!  Cart Model -->
+    <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+
+                <!-- head -->
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="cartModalLabel">
+                        <i class="bi bi-cart3 me-2"></i> Shopping Cart
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <!-- body -->
+                <div class="modal-body">
+
+                    <!-- table to view carts   -->
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th class="text-center">Qty</th>
+                                    <th>Price</th>
+                                    <th>Total</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="cartItems">
+                                <!-- ! add cart here when click btn (add to curt and btn bay in model view details) -->
+                            </tbody>
+                        </table>
+                    </div>
+
+
+                    <div class="d-flex  align-items-center border-top pt-3">
+                        <h5>Total Price: </h5>
+                        <h5 id="totalPrice" class="text-success"></h5>
+                    </div>
+
+                    <!-- shpping-address -->
+                    <div class="mt-3">
+                        <label for="shpping-address" class="form-label">Shopping Address</label>
+                        <input type="text" class="form-control" id="shpping-address" placeholder="Enter your address">
+                    </div>
+
+                    <!-- shpping-phone -->
+                    <div class="mt-3">
+                        <label for="shpping-phone" class="form-label">Shopping Phone</label>
+                        <input type="tel" class="form-control" id="shpping-phone" placeholder="Enter your phone number">
+                    </div>
+
+                    <!--Payment Method-->
+
+                    <div class="mt-4">
+                        <h6>Payment Method</h6>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="cash" value="Cash"
+                                checked>
+                            <label class="form-check-label" for="cash">Cash on Delivery</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="online"
+                                value="Online">
+                            <label class="form-check-label" for="online">Online Payment</label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <!-- when click ->add event to set order on firebase -->
+                    <button id="btn-buy-item" type="button" class="btn btn-success fw-bold">Place Order</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ! model to show Product details -->
+    <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0 rounded-4">
+
+                <!-- head -->
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold" id="productModalLabel">Product details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <!-- body -->
+                <div class="modal-body">
+                    <div class="row align-items-center">
+
+                        <div class="col-md-5 text-center">
+                            <!-- product img set src when call fun showDetails -->
+                            <img id="imgproduct" src="" alt="Product Image" class="img-fluid rounded-3 shadow-sm">
+                        </div>
+
+                        <div class="col-md-7">
+                            <!-- set (name,price,deacription,rate ) when call fun showDetails -->
+                            <h4 class="fw-bold mb-3" id="productName"></h4>
+                            <h5 class="text-success mb-3" id="productPrice"></h5>
+                            <p class="text-muted mb-3" id="productDescription">
+                            </p>
+
+                            <div class="mb-3 d-flex ">
+                                <img style="width: 15px; height: 15px; margin-right:10px" src="images/Filled_star.png">
+                                <p id="productRate" class="pRate"></p>
+                            </div>
+                            <!-- on click on an img call fun clickImg to update rate of product on firebase -->
+                            <div id="stars" class="d-flex justify-content-center mb-3">
+                                <img src="images/empty_star.png" img-click="1" onclick="clickImg(this)">
+                                <img src="images/empty_star.png" img-click="2" onclick="clickImg(this)">
+                                <img src="images/empty_star.png" img-click="3" onclick="clickImg(this)">
+                                <img src="images/empty_star.png" img-click="4" onclick="clickImg(this)">
+                                <img src="images/empty_star.png" img-click="5" onclick="clickImg(this)">
+                            </div>
+                            <!-- clik on(add event) call fun addtocurt to set product in cart -->
+                            <button id="btn-bay-fromModel" class="btn btn-success w-100">Buy🛒</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!--! Toast (Notification) show when add item in cart -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+        <div id="cartToast" class="toast custom-toast align-items-center text-white bg-success border-0" role="alert"
+            aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi bi-cart-check-fill me-2 fs-5"></i> Item added to cart!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ----------- -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="bootstrap-5.2.3-dist/js/bootstrap.bundle.js"></script>
+    <script src="homeUser.js" type="module"></script>
+</body>
+
+</html>

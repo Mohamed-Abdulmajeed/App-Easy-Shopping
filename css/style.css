@@ -1,0 +1,110 @@
+body {
+
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #fff;
+}
+
+.form-control {
+  border-radius: 2rem;
+  padding: 0.75rem 1.25rem;
+}
+
+
+#loginBtn:hover {
+  background-color: #b8340f;
+  color: #fff;
+}
+
+#registerBtn:hover {
+  background-color: #b8340f;
+  color: #fff;
+}
+
+.form-icon {
+  position: absolute;
+  top: 50%;
+  left: 1rem;
+  transform: translateY(-50%);
+  color: #888;
+}
+
+.input-group {
+  position: relative;
+}
+
+.input-group input {
+  padding-left: 2.5rem;
+}
+
+.small-text {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.option-btn {
+  margin: 5px;
+}
+
+.card-img-top {
+  width: 100%;
+  height: 150px;
+  object-fit: contain;
+  background-color: #15191d;
+
+}
+
+p {
+  font-size: 12px;
+}
+#input-search{
+  padding: 0 rem;
+  width: 400px;
+  height: 35px;
+}
+.card:hover{
+
+  transform: scale(1.05);
+
+}
+.form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, .25);
+        }
+
+.pRate{
+  color :#b3a4a4;
+  font-size:12px;
+  font-weight: bold;
+}
+
+
+.custom-toast {
+  transition: transform 0.5s ease, opacity 0.5s ease;
+  background: linear-gradient(135deg, #110c2b, #0602fc);
+  padding: 12px 20px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  animation: slideIn 0.5s forwards, slideOut 0.5s forwards 2.5s;
+}
+
+@keyframes slideIn {
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  to {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+}
+
+
+
+
+
