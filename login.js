@@ -129,7 +129,7 @@ document.getElementById("resetBtn").addEventListener("click", async () => {
 
   try {
     await sendPasswordResetEmail(auth, email, {
-      url: "http://127.0.0.1:5500/Projects/Project-E-commerce/login.html",
+      url: "https://app-easy-shopping.vercel.app/login.html",
       handleCodeInApp: false,
     });
 
