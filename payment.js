@@ -1,6 +1,6 @@
 // -- connection to firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import { ref, get, set , getDatabase } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+import { ref, get, set ,update, getDatabase } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyC2Nyp-pyciUk1CHWHTKFHig_WRTqJW7JQ",
@@ -75,10 +75,23 @@ if (snapshot.exists()) {
 
 // Set the new order data in the database
 await set(ref(database, `orders/${newId}`), setData);
+
+for (let i = 0; i <orderData.items.length; i++) {
+    await update(
+        ref(database, `products/${orderData.items[i].keyItem}`),
+        { quantity: orderData.items[i].quantity-orderData.items[i].count }
+    );
+}
+
 showModal("Order Added Successfully!");
 setTimeout(() => {
         window.location.href = "homeUser.html";
     }, 2000); 
 });
 
+// console.log(orderData.items.length);
+// console.log(orderData.items);
+// console.log(orderData.items[1].keyItem);
+// console.log(orderData.items[1].count);
+// console.log(orderData.items[1].quantity);
 

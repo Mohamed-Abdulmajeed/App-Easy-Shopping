@@ -3,10 +3,69 @@ body {
   font-family: 'Segoe UI', sans-serif;
   background-color: #fff;
 }
+.custom-btn {
+  min-width: 120px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+}
+
+.navbar {
+  font-size: 0.95rem;
+}
+.navbar .btn,
+.navbar .form-control {
+  height: 42px;
+}
+
+@media (max-width: 768px) {
+  #btn-search {
+    width: 100%;
+  }
+}
+
+
+
+@media (max-width: 768px) {
+  .navbar form {
+    width: 100%;
+    margin-top: 10px;
+  }
+  #btn-search {
+    width: 100%;
+  }
+}
+@media (max-width: 768px) {
+  .navbar .d-flex a {
+    width: 100%;
+    margin: 5px 0;
+  }
+}
 
 .form-control {
   border-radius: 2rem;
   padding: 0.75rem 1.25rem;
+}
+footer a {
+  transition: color 0.3s ease;
+}
+
+footer a:hover {
+  color: #ffc107; 
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.social-link:hover {
+  transform: scale(1.1);
+  color: #ffc107;
+  transition: 0.3s ease-in-out;
 }
 
 
@@ -52,19 +111,27 @@ body {
   background-color: #15191d;
 
 }
+.slide{
+  margin-top: 100px;
+  width: 90%;
+}
 
 p {
   font-size: 12px;
 }
 #input-search{
   padding: 0 rem;
-  width: 400px;
+  width: 300px;
   height: 35px;
 }
+.card{
+  transition: all 0.7s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border-radius: 12px;
+  overflow: hidden;}
 .card:hover{
 
-  transform: scale(1.05);
-
+  transform: translateY(-3px) scale(1.05) rotate(0.5deg);
+  box-shadow: 0 5px 15px lightyellow;
 }
 .form-control:focus {
             border-color: #0d6efd;
@@ -101,6 +168,12 @@ p {
   to {
     transform: translateX(120%);
     opacity: 0;
+  }
+}
+@media (max-width: 576px) {
+  .card {
+    margin: 10px auto; 
+    width: 75%;        
   }
 }
 

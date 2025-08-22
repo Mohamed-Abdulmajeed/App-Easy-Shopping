@@ -371,6 +371,7 @@ async function getOrders() {
         let statusItem = '<p class="mb-1">Status: <span class="badge bg-secondary">Pinding</span></p>';
         const keys = Object.keys(allOrders);
 
+        let addorderbtn = "";
         // Loop through each order and display its details
         // The order details include customer information, payment method, shopping address, and items
         // The items in order are displayed in a collapse list 
@@ -396,24 +397,38 @@ async function getOrders() {
             //check if status from order is(confirmed,completed ,cancelled,shipped,pinding)
             //and set statusItem to show in order tab
             if (status == "confirmed") {
+                addorderbtn = `<div class="d-flex gap-2">
+                            <button class="btn btn-warning btn-sm" onclick='updateStatus("${key}","shipped")'>shipped</button>
+                            <button class="btn btn-danger btn-sm"  onclick='updateStatus("${key}","cancelled")'> cancel</button>
+                            </div>`;
                 statusItem = `<p class="mb-1">Status: <span class="badge bg-primary">Confirmed</span></p>`;
             }
             else if (status == "completed") {
+                addorderbtn = "";
                 statusItem = `<p class="mb-1">Status: <span class="badge bg-success">Completed</span></p>`;
             }
             else if (status == "cancelled") {
+                addorderbtn = "";
                 statusItem = `<p class="mb-1">Status: <span class="badge bg-danger">cancelled</span></p>`;
             }
             else if (status == "shipped") {
+                addorderbtn = `<div class="d-flex gap-2">
+                            <button class="btn btn-success btn-sm" onclick='updateStatus("${key}","completed")'>complete</button>
+                            <button class="btn btn-danger btn-sm"  onclick='updateStatus("${key}","cancelled")'> cancel</button>
+                            </div>`;
                 statusItem = `<p class="mb-1">Status: <span class="badge bg-warning">Shipped </span></p>`;
             }
             else if (status == "pending") {
+                addorderbtn = `<div class="d-flex gap-2">
+                            <button class="btn btn-primary btn-sm" onclick='updateStatus("${key}","confirmed")'>confirm</button> 
+                            <button class="btn btn-danger btn-sm"  onclick='updateStatus("${key}","cancelled")'> cancel</button>
+                            </div>`;
                 statusItem = `<p class="mb-1">Status: <span class="badge bg-secondary">Pinding</span></p>`;
             }
 
             //loop on items in order and set them to all item
             for (const key in items) {
-            allitem += `
+                allitem += `
                 <tr>
                 <td class="text-dark">#${parseInt(key) + 1}</td>
                 <td class="text-danger">${items[key].name}</td>
@@ -423,8 +438,8 @@ async function getOrders() {
                 </tr>`
             }
 
-//this element in order tab 
-document.getElementById("all-orders").innerHTML += `
+            //this element in order tab 
+            document.getElementById("all-orders").innerHTML += `
 
 <div class="list-group-item p-3">
     <div class="d-flex justify-content-between align-items-center flex-wrap">
@@ -433,12 +448,7 @@ document.getElementById("all-orders").innerHTML += `
         <p class="mb-1 text-muted">Date: ${datetime}</p>
         <div>${statusItem}</div> 
         </div>
-        <div class="d-flex gap-2">
-    <button class="btn btn-primary btn-sm" onclick='updateStatus("${key}","confirmed")'>confirm</button>
-    <button class="btn btn-success btn-sm" onclick='updateStatus("${key}","completed")'>complete</button>
-    <button class="btn btn-danger btn-sm"  onclick='updateStatus("${key}","cancelled")'> cancel</button>
-    <button class="btn btn-warning btn-sm" onclick='updateStatus("${key}","shipped")'>shipped</button>
-</div>
+        ${addorderbtn}
     <div class="text-end">
         <p class="mb-1 fw-bold">Total: $ ${total_bill}</p>
         
@@ -493,11 +503,40 @@ async function getcustomer(Id) {
 async function updateStatus(key, status) {
 
     try {
-        console.log(status);
+        // console.log(status);
 
         await update(ref(database, `orders/${key}`), { status: status });
 
         getOrders();
+        //-----------------
+        if (status == "cancelled") {
+
+
+            const prodRef = ref(database, 'products');
+            const prod = await get(prodRef);
+            const allprod = prod.val();
+
+            const ordersRef = ref(database, 'orders');
+            const orders = await get(ordersRef);
+            const allOrders = orders.val();
+            var arr = [];
+            for (const k in allOrders) {
+                if (k == key) {
+                    arr = allOrders[k].items;
+                }
+            }
+
+            for (let i = 0; i < arr.length; i++) {
+                // update the quantity of each product in firebase
+                await update(
+                    ref(database, `products/${arr[i].keyItem}`),
+                    { quantity: allprod[arr[i].keyItem].quantity + arr[i].count }
+                );
+            }
+        }
+        getProducts();
+        //-----------------
+
 
         showModal(`Order ${key} updated successfully`);
     } catch (error) {
@@ -522,8 +561,8 @@ async function getAllCustomers() {
             const key = keys[i];
             var { address, email, name, phone } = allcustomers[key];
 
-// add customer data to the customers table body
-body.innerHTML += `
+            // add customer data to the customers table body
+            body.innerHTML += `
 <tr>
     <td>${name}</td>
     <td>${address}</td>
@@ -532,7 +571,7 @@ body.innerHTML += `
 </tr>
 `;
 
-}
+        }
 
     } catch (error) {
         console.error(error);
@@ -577,12 +616,12 @@ document.getElementById("addAdmin").addEventListener("click", async () => {
     const email = document.getElementById("input-email").value.trim();
     const password = document.getElementById("input-password").value.trim();
     const username = document.getElementById("input-name").value.trim();
-// check if email, password, and username are not empty
+    // check if email, password, and username are not empty
     if (!email || !password || !username) {
         showModal("Please fill all fields.❗❗❗");
         return;
     }
-// validate email, password, and username using regex
+    // validate email, password, and username using regex
     const rgxEmail = /^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$/
     const rgxPass = /^[a-zA-Z0-9]{6,10}$/
     const rgxName = /^[A-Za-z]{3,}( [A-Za-z]{3,})+$/
@@ -682,7 +721,7 @@ window.deleteSlide = deleteSlide;
 
 document.getElementById('btn-add-slide').addEventListener("click", async () => {
     let img = document.getElementById('imageslide').value;
-    
+
     // Check if the image link is empty
     if (img == null || img == "") {
         showModal("Enter image link!");

@@ -123,7 +123,7 @@ for (const key in products.val()) {
     var { category, image, name, price, rate,NoOfPersons } = allProduct[key];
 
     itemsinbody.innerHTML += `
-    <div class="col-lg-3 col-md-4 col-sm-6">
+    <div class="col-lg-3 col-md-4 col-sm-6 mb-4 px-2">
         <div class="card h-100 bg-dark">
         <img src="${image}" class="card-img-top w-100">
         <div class="card-body d-flex flex-column">
@@ -177,7 +177,7 @@ for (const key in sliders.val()) {
 
     imgSlider.innerHTML += `
         <div class="carousel-item active">
-            <div class="ratio ratio-16x9">
+            <div class="ratio ratio-21x9">
                 <img src="${image}" class="img-fluid w-100 h-100 object-fit-cover">
             </div>
         </div>`;
@@ -188,7 +188,7 @@ for (const key in sliders.val()) {
 
     imgSlider.innerHTML += `
         <div class="carousel-item">
-            <div class="ratio ratio-16x9">
+            <div class="ratio ratio-21x9">
                 <img src="${image}" class="img-fluid w-100 h-100 object-fit-cover">
             </div>
         </div>`;
@@ -237,14 +237,6 @@ async function showDetails(val) {
     const inputdescription = document.getElementById("productDescription");
     const inputrate = document.getElementById("productRate");
 
-    // when click on an img call fun clickImg
-    document.getElementById("stars").innerHTML= `
-    <img src="images/empty_star.png" img-click="1" onclick="clickImg(this)">
-    <img src="images/empty_star.png" img-click="2" onclick="clickImg(this)">
-    <img src="images/empty_star.png" img-click="3" onclick="clickImg(this)">
-    <img src="images/empty_star.png" img-click="4" onclick="clickImg(this)">
-    <img src="images/empty_star.png" img-click="5" onclick="clickImg(this)">
-    `;
 
 // loop on products and check if key match val ->(if true) set values in model
     for (const key in products.val()) {
@@ -262,59 +254,6 @@ async function showDetails(val) {
 }
 window.showDetails = showDetails;
 
-// !______________clickImg________________
-
-// this fun run when click on img star in model and update rate of product
-async function clickImg(img) {
-
-    var div = document.getElementById("stars");
-
-    // get num of img-click from imgs
-    var n = parseInt(img.getAttribute("img-click"));
-    div.innerHTML = "";
-    // loop from 1 to 5 to update stars in div in model
-    for (let i = 1; i <= 5; i++) {
-        if (i <= n) {
-            div.innerHTML += `<img src="images/Filled_star.png" img-click="${i}"  onclick="clickImg(this)">`
-        } else {
-            div.innerHTML += `<img src="images/empty_star.png" img-click="${i}"  onclick="clickImg(this)">`
-        }
-    } 
-//    get product from firebase and update rate and NoOfPersons
-    const productsRefget = ref(database, 'products');
-    const products = await get(productsRefget);
-    const allProduct = products.val();
-
-    const NoPerson = allProduct[NoOfProduct].NoOfPersons ;
-    const sumrate = allProduct[NoOfProduct].rate * NoPerson;
-    
-    // calc new rate to set this in update
-    let rate = Math.round((sumrate +n )/(NoPerson+1)*10)/10;
-    // console.log(rate);
-    
-    let updatedData = {
-        category:allProduct[NoOfProduct].category,
-        name: allProduct[NoOfProduct].name,
-        price: allProduct[NoOfProduct].price,
-        image: allProduct[NoOfProduct].image,
-        description: allProduct[NoOfProduct].description,
-        quantity: allProduct[NoOfProduct].quantity,
-        rate: rate,
-        NoOfPersons: allProduct[NoOfProduct].NoOfPersons +1,
-    };
-    // console.log(updatedData)
-    // update product in firebase
-    const productRef = ref(database, 'products/' + NoOfProduct);
-    update(productRef, updatedData)
-        .then(() => {
-            getProducts();
-        })
-        .catch((error) => {
-            console.error("Failed in Update", error);
-        });
-}
-window.clickImg = clickImg;
- 
 
 
 

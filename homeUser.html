@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home User</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
-    <link href="bootstrap-5.2.3-dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
@@ -15,60 +14,66 @@
 <body class="bg-secondary">
 
     <!--!_______ Navbar___________ -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top m-0">
-        <div class="container m-0">
-            <!-- Name & logo -->
-            <a class="navbar-brand fw-bold" href="#">
-                <img src="images/icon.png" alt="Cart Icon" width="40px">
-                Eazy Shop
-            </a>
-            <!-- btn toggler -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm">
+  <div class="container-fluid">
+    <!-- Logo -->
+    <a class="navbar-brand fw-bold d-flex align-items-center" href="#">
+      <img src="images/icon.png" alt="Cart Icon" width="40" class="me-2"> Eazy Shop
+    </a>
 
-            <div class="collapse navbar-collapse" id="mainNav">
-                <!-- drop-down item -->
-                <ul class="navbar-nav me-3">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            Categories
-                        </a>
-                        <ul class="dropdown-menu" id="dropdown-item-categories"></ul>
-                    </li>
-                </ul>
-                <!-- form search -->
-                <form class="d-flex flex-grow-1 me-2" role="search">
-                    <input id="input-search" class="form-control me-1" type="search" placeholder="Search products..."
-                        aria-label="Search" />
-                    <button id="btn-search" class="btn btn-outline-success" type="submit">Search</button>
-                </form>
-                <!-- buttons to swap between tabs  -->
-                <!--each btn call fun  showTab to go to tab-->
-                <div class="d-flex">
-                    <button class="btn btn-outline-primary btn-sm me-2" onclick="showTab('items')">
-                        <i class="fa-solid fa-box"></i> Items
-                    </button>
-                    <button class="btn btn-outline-primary btn-sm me-2" onclick="showTab('orders')">
-                        <i class="fa-solid fa-list"></i> Orders
-                    </button>
-                    <!-- btn to show card in model and on click add event to call fun ( refreshCurd )-->
-                    <button id="btncart" type="button" class="btn btn-outline-info position-relative"
-                        data-bs-toggle="modal" data-bs-target="#cartModal">
-                        <i class="bi bi-cart3 fs-4"></i>Cart
-                        <!-- this value update when add cart -->
-                        <span id="NoCart"
-                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                            0
-                        </span>
-                    </button>
-                    <button class="btn btn-outline-danger ms-3" onclick="window.location.href = 'index.html'">
-                        <i class="fa fa-sign-out "></i>Logout
-                    </button>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <!-- Toggler -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Navbar Content -->
+    <div class="collapse navbar-collapse" id="mainNav">
+      <!-- Categories -->
+      <ul class="navbar-nav me-lg-3 mb-3 mb-lg-0">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+            Categories
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark shadow" id="dropdown-item-categories"></ul>
+        </li>
+      </ul>
+
+      <!-- Search -->
+      <form class="d-flex flex-column flex-lg-row flex-grow-1 align-items-stretch mb-3 mb-lg-0 me-lg-3" role="search">
+        <input id="input-search" class="form-control mb-2 mb-lg-0 me-lg-2" type="search"
+          placeholder="Search products..." aria-label="Search" />
+        <button id="btn-search" class="btn btn-warning" type="submit">
+          <i class="bi bi-search"></i> Search
+        </button>
+      </form>
+
+      <!-- Actions -->
+      <div class="d-flex flex-column flex-lg-row align-items-stretch">
+        <button class="btn btn-outline-warning mb-2 mb-lg-0 me-lg-2" onclick="showTab('items')">
+          <i class="fa-solid fa-box"></i> Items
+        </button>
+        <button class="btn btn-outline-warning mb-2 mb-lg-0 me-lg-2" onclick="showTab('orders')">
+          <i class="fa-solid fa-list"></i> Orders
+        </button>
+
+        <!-- Cart -->
+        <button id="btncart" type="button" class="btn btn-outline-warning position-relative mb-2 mb-lg-0 me-lg-2"
+          data-bs-toggle="modal" data-bs-target="#cartModal">
+          <i class="bi bi-cart3"></i> Cart
+          <span id="NoCart" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            0
+          </span>
+        </button>
+
+        <!-- Logout -->
+        <button class="btn btn-outline-warning" onclick="window.location.href = 'index.html'">
+          <i class="fa fa-sign-out"></i> Logout
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
 
     <!--! _____Page budy _________-->
     <div class="container mt-5 pt-5">
@@ -231,16 +236,11 @@
                                 <img style="width: 15px; height: 15px; margin-right:10px" src="images/Filled_star.png">
                                 <p id="productRate" class="pRate"></p>
                             </div>
-                            <!-- on click on an img call fun clickImg to update rate of product on firebase -->
-                            <div id="stars" class="d-flex justify-content-center mb-3">
-                                <img src="images/empty_star.png" img-click="1" onclick="clickImg(this)">
-                                <img src="images/empty_star.png" img-click="2" onclick="clickImg(this)">
-                                <img src="images/empty_star.png" img-click="3" onclick="clickImg(this)">
-                                <img src="images/empty_star.png" img-click="4" onclick="clickImg(this)">
-                                <img src="images/empty_star.png" img-click="5" onclick="clickImg(this)">
+                            <div class="mb-3 d-flex ">
+                                <p id="pavailable" class=""></p>
                             </div>
-                            <!-- clik on(add event) call fun addtocurt to set product in cart -->
-                            <button id="btn-bay-fromModel" class="btn btn-success w-100">Buy🛒</button>
+
+                            <button id="btn-bay-fromModel" class="btn btn-warning w-100">Buy🛒</button>
                         </div>
                     </div>
                 </div>
@@ -269,7 +269,6 @@
     <!-- ----------- -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script src="bootstrap-5.2.3-dist/js/bootstrap.bundle.js"></script>
     <script src="homeUser.js" type="module"></script>
 </body>
 

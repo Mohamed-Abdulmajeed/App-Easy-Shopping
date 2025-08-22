@@ -58,7 +58,7 @@ async function filterProducts(categ) {
         // loop on all product and check if category = selected categ
         for (const key in products.val()) {
 
-            var { category, rate, image, name, price, NoOfPersons } = allProduct[key];
+            var { category, rate, image, name, price, NoOfPersons, quantity } = allProduct[key];
             if (category == categ || categ == "All Categories") {
                 itemsinbody.innerHTML += `
         <div class="col-lg-3 col-md-4 col-sm-6">
@@ -73,10 +73,17 @@ async function filterProducts(categ) {
             </div>
             <div class="d-flex gap-2 mt-auto">
             <button class="btn btn-outline-light " data-bs-toggle="modal" data-bs-target="#productModal" onclick="showDetails(this.value)" value ='${key}'" >View</button>
-            <button class="btn btn-warning w-100 mt-auto" onclick="addtocurt(this.value)" value ='${key}'>Add to Cart</button>
+            <button id="btncurt${key}" class="btn btn-warning w-100 mt-auto" onclick="addtocurt(this.value)" value ='${key}'>Add to Cart</button>
             </div>
         </div>
-    </div>`
+    </div>`;
+                if (quantity > 0) {
+                    document.getElementById(`btncurt${key}`).disabled = false;
+                    document.getElementById(`btncurt${key}`).innerText = "Add to Cart";
+                } else {
+                    document.getElementById(`btncurt${key}`).disabled = true;
+                    document.getElementById(`btncurt${key}`).innerText = "Out of stock";
+                }
             }
         }
     } catch (error) {
@@ -96,7 +103,7 @@ async function filterbySearchProducts(nm) {
         itemsinbody.innerHTML = "";
 
         for (const key in products.val()) {
-            var { rate, image, name, price, NoOfPersons } = allProduct[key];
+            var { rate, image, name, price, NoOfPersons, quantity } = allProduct[key];
             if (name.toLowerCase().includes(nm.toLowerCase())) {
                 itemsinbody.innerHTML += `
         <div class="col-lg-3 col-md-4 col-sm-6">
@@ -111,10 +118,17 @@ async function filterbySearchProducts(nm) {
             </div>
             <div class="d-flex gap-2 mt-auto">
             <button class="btn btn-outline-light " data-bs-toggle="modal" data-bs-target="#productModal" onclick="showDetails(this.value)" value ='${key}'" >View</button>
-            <button class="btn btn-warning w-100 mt-auto" onclick="addtocurt(this.value)" value ='${key}'>Add to Cart</button>
+            <button id="btncurt${key}" class="btn btn-warning w-100 mt-auto" onclick="addtocurt(this.value)" value ='${key}'>Add to Cart</button>
             </div>
         </div>
-    </div>`
+    </div>`;
+                if (quantity > 0) {
+                    document.getElementById(`btncurt${key}`).disabled = false;
+                    document.getElementById(`btncurt${key}`).innerText = "Add to Cart";
+                } else {
+                    document.getElementById(`btncurt${key}`).disabled = true;
+                    document.getElementById(`btncurt${key}`).innerText = "Out of stock";
+                }
             }
         }
 
@@ -151,7 +165,7 @@ async function getProducts() {
         // loop and set all product to itemsinbody
         for (const key in products.val()) {
 
-            var { category, rate, image, name, price, NoOfPersons } = allProduct[key];
+            var { category, rate, image, name, price, NoOfPersons, quantity } = allProduct[key];
 
             itemsinbody.innerHTML += `
     <div class="col-lg-3 col-md-4 col-sm-6">
@@ -175,6 +189,13 @@ async function getProducts() {
                 arrCategories.push(category);
                 itemcategories.innerHTML += `<li onclick='filterProducts("${category}")'><a class="dropdown-item" href="#">${category}</a></li>`;
             }
+            if (quantity > 0) {
+                document.getElementById(`btncurt${key}`).disabled = false;
+                document.getElementById(`btncurt${key}`).innerText = "Add to Cart";
+            } else {
+                document.getElementById(`btncurt${key}`).disabled = true;
+                document.getElementById(`btncurt${key}`).innerText = "Out of stock";
+            }
         }
 
     } catch (error) {
@@ -190,45 +211,48 @@ getProducts();
 // and change the stars to filled or empty stars
 // and update the rate in firebase
 // and show the new rate in model
-async function clickImg(img) {
+async function clickImg(img, key, koforder, ind) {
 
-    var div = document.getElementById("stars");
+    var div = document.getElementById(`${key}`);
     var n = parseInt(img.getAttribute("img-click"));
     div.innerHTML = "";
     for (let i = 1; i <= 5; i++) {
         if (i <= n) {
-            div.innerHTML += `<img src="images/Filled_star.png" img-click="${i}"  onclick="clickImg(this)">`
+            div.innerHTML += `<img src="images/Filled_star.png" img-click="${i}"  onclick="clickImg(this,'${key}','${koforder}','${ind}')">`
         } else {
-            div.innerHTML += `<img src="images/empty_star.png" img-click="${i}"  onclick="clickImg(this)">`
+            div.innerHTML += `<img src="images/empty_star.png" img-click="${i}"  onclick="clickImg(this,'${key}','${koforder}','${ind}')">`
         }
     }
     // get product from firebase and update the rate and NoOfPersons
     const productsRefget = ref(database, 'products');
     const products = await get(productsRefget);
     const allProduct = products.val();
+    // console.log(key);
 
-    const NoPerson = allProduct[NoOfProduct].NoOfPersons;
-    const sumrate = allProduct[NoOfProduct].rate * NoPerson;
+    const NoPerson = allProduct[key].NoOfPersons;
+    const sumrate = allProduct[key].rate * NoPerson;
     // calc rate 
     let rate = Math.round((sumrate + n) / (NoPerson + 1) * 10) / 10;
     // console.log(rate);
 
+    await update(
+        ref(database, `orders/${koforder}/items/${ind}`),
+        { checkRate: true }
+    );
+
     let updatedData = {
-        category: allProduct[NoOfProduct].category,
-        name: allProduct[NoOfProduct].name,
-        price: allProduct[NoOfProduct].price,
-        image: allProduct[NoOfProduct].image,
-        description: allProduct[NoOfProduct].description,
-        quantity: allProduct[NoOfProduct].quantity,
         rate: rate,
-        NoOfPersons: allProduct[NoOfProduct].NoOfPersons + 1,
+        NoOfPersons: allProduct[key].NoOfPersons + 1,
     };
     // console.log(updatedData)
     // update the product in firebase
-    const productRef = ref(database, 'products/' + NoOfProduct);
+    const productRef = ref(database, 'products/' + key);
     update(productRef, updatedData)
         .then(() => {
             getProducts();
+            setTimeout(() => {
+                getOrders();
+            }, 2000);
         })
         .catch((error) => {
             console.error("Failed in Update", error);
@@ -258,26 +282,35 @@ async function showDetails(val) {
     const inputimageLink = document.getElementById("imgproduct");
     const inputdescription = document.getElementById("productDescription");
     const inputrate = document.getElementById("productRate");
-
-    // when click on an img call fun clickImg
-    document.getElementById("stars").innerHTML = `
-    <img src="images/empty_star.png" img-click="1" onclick="clickImg(this)">
-    <img src="images/empty_star.png" img-click="2" onclick="clickImg(this)">
-    <img src="images/empty_star.png" img-click="3" onclick="clickImg(this)">
-    <img src="images/empty_star.png" img-click="4" onclick="clickImg(this)">
-    <img src="images/empty_star.png" img-click="5" onclick="clickImg(this)">
-    `;
+    const inputavailable = document.getElementById("pavailable");
 
     // loop on products and check if key match val ->(if true) set values in model
 
     for (const key in products.val()) {
-        var { description, image, name, price, rate, NoOfPersons } = allProduct[key];
+        var { description, image, name, price, rate, NoOfPersons, quantity } = allProduct[key];
         if (key == val) {
             inputname.innerHTML = `Product Name: ${name}`;
             inputprice.innerHTML = `Product Price: $ ${price}`;
             inputimageLink.src = image;
             inputdescription.innerHTML = description;
             inputrate.innerHTML = `${rate} (${NoOfPersons})`;
+            if (quantity > 0) {
+                inputavailable.innerHTML = `Available: <span class="text-success">${quantity} in stock</span>`;
+                document.getElementById("btn-bay-fromModel").disabled = false;
+                document.getElementById("btn-bay-fromModel").innerText = "Buy🛒";
+            } else {
+                inputavailable.innerHTML = `Available: <span class="text-danger">Out of stock</span>`;
+                document.getElementById("btn-bay-fromModel").disabled = true;
+                document.getElementById("btn-bay-fromModel").innerText = "Out of stock";
+            }
+            // if (arrAllCurt.find(item => item.keyItem == key)) {
+            //     let btn = document.getElementById(`btn-bay-fromModel`);
+            //     btn.classList.remove("btn-warning");
+            //     btn.classList.add("btn-success");
+            //     btn.innerText = "✔ Added";
+            //     btn.disabled = true;
+                
+            // }
         }
     }
 
@@ -297,6 +330,10 @@ async function addtocurt(keyItem) {
         // get products from firebase and check if keyItem match product key
         //if true then add product to arrAllCurt
         //and show toast message added to cart
+        if (arrAllCurt.find(item => item.keyItem == keyItem)) {
+            showModal("This item is already in the cart.");
+            return;
+        }
 
         const productsRef = ref(database, 'products');
         const products = await get(productsRef);
@@ -304,11 +341,11 @@ async function addtocurt(keyItem) {
         total = 0;
 
         for (const key in products.val()) {
-            var { name, price, } = allProduct[key];
+            var { name, price,quantity } = allProduct[key];
             var count = 1;
             var totalp = price
             if (key == keyItem) {
-                arrAllCurt.push({ name, price, count, totalp, keyItem });
+                arrAllCurt.push({ name, price, count, totalp, keyItem,quantity, checkRate: false });
                 // show toast message added to cart
                 const toastEl = document.getElementById('cartToast');
                 const toast = new bootstrap.Toast(toastEl, { delay: 1000 });
@@ -322,6 +359,8 @@ async function addtocurt(keyItem) {
         btn.classList.add("btn-success");
         btn.innerText = "✔ Added";
         btn.disabled = true;
+
+        
 
 
     } catch (error) {
@@ -401,7 +440,17 @@ document.getElementById("btn-buy-item").addEventListener("click", async () => {
     const modalEl = document.getElementById("cartModal");
     const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
     modal.hide();
+    
+//-------------------------
+for (let i = 0; i < arrAllCurt.length; i++) {
+    await update(
+        ref(database, `products/${arrAllCurt[i].keyItem}`),
+        { quantity: arrAllCurt[i].quantity-arrAllCurt[i].count }
+    );
+}
+//-------------------------
     getOrders();
+    getProducts();
     showModal("Order Added Successfully!");
     arrAllCurt = [];
     total = 0;
@@ -415,41 +464,73 @@ document.getElementById("btn-buy-item").addEventListener("click", async () => {
 //and show them in order tab
 async function getOrders() {
     try {
-
+        document.getElementById("all-orders").innerHTML = '';
         //get orders from firebase
         //and loop on all orders 
         //and check if customer id match current user id
         const ordersRef = ref(database, 'orders');
         const orders = await get(ordersRef);
         const allOrders = orders.val();
+        const keys = Object.keys(allOrders);
         let statusItem = '<p class="mb-1">Status: <span class="badge bg-secondary">Pinding</span></p>';
+        let addcancelbtn = "";
+        for (let i = keys.length - 1; i >= 0; i--) {
+            const key = keys[i];
 
-        for (const key in orders.val()) {
             let allitem = '';
+            var koforder = key;
             var { datetime, total_bill, status, items, customer_id } = allOrders[key];
             if (customer_id == auth.currentUser.uid) {
                 statusItem = '<p class="mb-1">Status: <span class="badge bg-secondary">Pinding</span></p>';
 
                 //check if status from order is(confirmed,completed ,cancelled,shipped,pinding)
                 //and set statusItem to show in order tab
-                if (status == "confirmed") {
+                if (status == "pending") {
+                    addcancelbtn = `<div class="d-flex gap-2">
+                    <button class="btn btn-danger btn-sm"  onclick='updateStatus("${key}","cancelled")'> cancel</button>
+                    </div>`;
+                    statusItem = `<p class="mb-1">Status: <span class="badge bg-secondary">Pinding </span></p>`;
+                } else if (status == "confirmed") {
+                    addcancelbtn = "";
                     statusItem = `<p class="mb-1">Status: <span class="badge bg-primary">Confirmed</span></p>`;
                 }
                 else if (status == "completed") {
+                    addcancelbtn = "";
                     statusItem = `<p class="mb-1">Status: <span class="badge bg-success">Completed</span></p>`;
                 }
                 else if (status == "cancelled") {
+                    addcancelbtn = "";
                     statusItem = `<p class="mb-1">Status: <span class="badge bg-danger">cancelled</span></p>`;
                 }
                 else if (status == "shipped") {
+                    addcancelbtn = "";
                     statusItem = `<p class="mb-1">Status: <span class="badge bg-warning">Shipped </span></p>`;
                 }
-                else if (status == "pinding") {
-                    statusItem = `<p class="mb-1">Status: <span class="badge bg-secondary">Pinding </span></p>`;
-                }
+
 
                 //loop on items in order and set them to all item
                 for (const key in items) {
+                    if (items[key].checkRate == false) {
+                        if (status == "completed") {
+                            var checkrate = `<div id="${items[key].keyItem}" class="d-flex justify-content-center mb-3">
+                            <img src="images/empty_star.png" img-click="1" onclick="clickImg(this,'${items[key].keyItem}','${koforder}','${key}')">
+                            <img src="images/empty_star.png" img-click="2" onclick="clickImg(this,'${items[key].keyItem}','${koforder}','${key}')">
+                            <img src="images/empty_star.png" img-click="3" onclick="clickImg(this,'${items[key].keyItem}','${koforder}','${key}')">
+                            <img src="images/empty_star.png" img-click="4" onclick="clickImg(this,'${items[key].keyItem}','${koforder}','${key}')">
+                            <img src="images/empty_star.png" img-click="5" onclick="clickImg(this,'${items[key].keyItem}','${koforder}','${key}')">
+                        </div>`;
+                        }
+                        else {
+                            var checkrate = "";
+                        }
+
+                    }
+                    else {
+                        var checkrate = `<div id="${items[key].keyItem}" class="d-flex justify-content-center mb-3">
+                        Rating Done</div>`
+                    }
+
+
                     allitem += `
                 
                 <tr>
@@ -458,6 +539,7 @@ async function getOrders() {
                 <td class="text-primary">Price: $ ${items[key].price}</td>
                 <td class="text-danger">Count: ${items[key].count}</td>
                 <td class="text-success">Total Price: $ ${items[key].totalp}</td> 
+                <td class="text-secondary">${checkrate} </td>
                 </tr>
                 
                 `;
@@ -471,7 +553,7 @@ async function getOrders() {
         <h6 class="mb-1">Order #${key}</h6>
         <p class="mb-1 text-muted">Date: ${datetime}</p>
         ${statusItem}
-    </div>
+    </div> ${addcancelbtn}
     <div class="text-end">
         <p class="mb-1 fw-bold">Total: $ ${total_bill}</p>
         
@@ -506,6 +588,55 @@ async function getOrders() {
 
 getOrders();
 
+// !________________updateStatus__________
+// This function updates the status of an order in Firebase
+// It takes the order key and the new status as parameters
+// this fun run when the user clicks on the confirm, complete, cancel, or shipped button in the order tab
+async function updateStatus(key, status) {
+
+    try {
+        console.log(status);
+
+        await update(ref(database, `orders/${key}`), { status: status });
+
+        getOrders();
+
+//-----------------
+if (status == "cancelled") {
+
+
+    const prodRef = ref(database, 'products');
+    const prod = await get(prodRef);
+    const allprod = prod.val(); 
+
+    const ordersRef = ref(database, 'orders');
+    const orders = await get(ordersRef);
+    const allOrders = orders.val(); 
+    var arr=[];
+    for (const k in allOrders) {
+        if (k == key) {
+            arr = allOrders[k].items;
+        }
+    }
+    
+    for (let i = 0; i < arr.length; i++) {
+    // update the quantity of each product in firebase
+    await update(
+        ref(database, `products/${arr[i].keyItem}`),
+        { quantity: allprod[arr[i].keyItem].quantity +arr[i].count }
+    );
+    }
+}
+getProducts();
+//-----------------
+
+
+        showModal(`Order ${key} updated successfully`);
+    } catch (error) {
+        console.error("Error updating order:", error);
+    }
+}
+window.updateStatus = updateStatus;
 
 // !________________btncart______________________
 
@@ -579,8 +710,9 @@ window.minusCout = minusCout;
 // this function run when click on btn plus in cart
 function plusCout(ind) {
 
-    if (arrAllCurt[ind].count != 100) {
+    if (arrAllCurt[ind].count != 100 && arrAllCurt[ind].count < arrAllCurt[ind].quantity) {
         arrAllCurt[ind].count++;
+        
     }
     arrAllCurt[ind].totalp = arrAllCurt[ind].count * arrAllCurt[ind].price;
     refreshCurd();
